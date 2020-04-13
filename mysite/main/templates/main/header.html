@@ -1,0 +1,35 @@
+<head>
+	<meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width">
+	<title>Automarket</title>
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'main/style.css' %}">
+</head>
+<body>
+
+	<header>
+		<div class="container">
+			<div id="branding">
+				<h1><span class="highlight">Automarket</span></h1>
+			</div>
+			<nav>
+				<ul>
+					<li id="demo"><button class="btn" href="/demo">Demo</a></li>
+					<li><a href="/">Home</a></li>
+					<li><a href="/login">Login</a></li>
+					<li><a href="/register">Register</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+
+	{% block content %}
+	{% endblock%}
+
+	<!--
+	<footer>
+		<p>Automarket, Prototype Website</p>
+	</footer>
+	-->
+
+</body>

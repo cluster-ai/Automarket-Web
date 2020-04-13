@@ -1,0 +1,4 @@
+env/
+**/settings.py
+*.sqlite3
+project/
