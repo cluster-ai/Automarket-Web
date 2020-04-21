@@ -1,22 +1,33 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Tutorial
-from django.contrib.auth.forms import UserCreationForm
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
+#local
+from .forms import DemoLogin
+from .models import DemoKey
 
-def homepage(request):
-	return render(request=request, template_name='main/home.html',
-				  context={'tutorials': Tutorial.objects.all})
+# Create your views here.
 
-def register(request):
-	form = UserCreationForm
+def landing_page(request):
+	if request.method == 'POST':
+		form = DemoLogin(request.POST)
+		if form.is_valid():
+			key = form.cleaned_data.get('key')
+			try:
+				db_val = DemoKey.objects.get(key=key)
+				print(db_val)
+			except DemoKey.DoesNotExist:
+				messages.error(request, f'Invalid Key: {key}')
+			else:
+				return redirect('main:demo')
+	else:
+		form = DemoLogin(request.POST)
+
 	return render(request,
-				  'main/register.html',
+				  'main/landing.html',
 				  context={'form': form})
 
-def login(request):
-	form = UserCreationForm
+
+def demo_page(request):
 	return render(request,
-				  'main/login.html',
-				  context={'form': form})
+				  'main/demo.html')

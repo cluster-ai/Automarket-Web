@@ -2,3 +2,5 @@ env/
 **/settings.py
 *.sqlite3
 project/
+**/migrations/
+**/__pycache__/

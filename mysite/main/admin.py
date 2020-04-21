@@ -1,6 +1,9 @@
 from django.contrib import admin
-from .models import Tutorial
+
+#local
+from .models import DemoKey
+from .models import HistoricalData
 
 # Register your models here.
-
-admin.site.register(Tutorial)
+admin.site.register(DemoKey)
+admin.site.register(HistoricalData)

@@ -1,35 +1,46 @@
+
 <head>
 	<meta charset='utf-8'>
 	<meta name="viewport" content="width=device-width">
 	<title>Automarket</title>
 	{% load static %}
-	<link rel="stylesheet" href="{% static 'main/style.css' %}">
+	<link rel="stylesheet" href="{% static 'main/css/style.css' %}">
 </head>
 <body>
 
 	<header>
 		<div class="container">
 			<div id="branding">
-				<h1><span class="highlight">Automarket</span></h1>
+				<a href="/" id="logo">Automarket</a>
 			</div>
-			<nav>
-				<ul>
-					<li id="demo"><button class="btn" href="/demo">Demo</a></li>
-					<li><a href="/">Home</a></li>
-					<li><a href="/login">Login</a></li>
-					<li><a href="/register">Register</a></li>
-				</ul>
-			</nav>
+			<script type="text/javascript">
+				function toggle_login(){
+					let popup = document.querySelector("#demo_login");
+					if (popup.style.visibility == "hidden"){
+						popup.style.visibility = "visible"
+					}
+					else{
+						popup.style.visibility = "hidden"
+					}
+				}
+			</script>
+			<button class="btn" onclick="toggle_login()">Demo Product</button>
 		</div>
 	</header>
 
-	{% block content %}
-	{% endblock%}
+	{% if messages %}
+		{% for message in messages %}
+			<script>
+				alert('{{message}}')
+			</script>
+		{% endfor %}
+	{% endif %}
 
-	<!--
+	{% block content %}
+	{% endblock %}
+
 	<footer>
 		<p>Automarket, Prototype Website</p>
 	</footer>
-	-->
 
 </body>

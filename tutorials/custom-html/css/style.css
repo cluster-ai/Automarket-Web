@@ -17,15 +17,13 @@ ul{
 	padding: 0;
 }
 
-.btn{
+.button_1{
+	height: 38px;
 	background: #86C232;
 	border: 0;
+	padding-left: 20px;
+	padding-right: 20px;
 	color: #f4f4f4;
-}
-
-.btn:hover{
-	color: #cccccc;
-	background-color: #61892F;
 }
 
 /* Header */
@@ -37,7 +35,7 @@ header{
 	border-bottom: #86C232 3px solid;
 }
 
-header a, button{
+header a{
 	color: #f4f4f4;
 	text-decoration: none;
 	text-transform: uppercase;
@@ -47,10 +45,6 @@ header a, button{
 header li{
 	float: left;
 	display: inline;
-	padding: 8px 20px 8px 20px;
-}
-
-header #demo{
 	padding: 0 20px 0 20px;
 }
 
@@ -64,12 +58,7 @@ header #branding h1{
 
 header nav{
 	float: right;
-	margin-top: 5px;
-}
-
-header button{
-	padding: 10px;
-	border-radius: 4px;
+	margin-top: 10px;
 }
 
 header .highlight{
@@ -84,7 +73,7 @@ header a:hover{
 /* Showcase */
 #showcase{
 	min-height: 400px;
-	background: url('/static/main/showcase.jpg') no-repeat 0 -400px;
+	background: url("../img/showcase.jpg") no-repeat 0 -400px;
 	text-align: center;
 	color: #f4f4f4;
 }
@@ -121,24 +110,6 @@ header a:hover{
 
 #boxes .box img{
 	width: 90px;
-}
-
-/* Form */
-.form {
-	font-size: 20px;
-	border: 1px solid #86C232;
-	width: 300px;
-	text-align: center;
-	border-radius: 4px;
-	color: #f4f4f4;
-	padding: 20px;
-	margin: auto;
-}
-
-.form input, .form button{
-	font-size: 15px;
-	padding: 10px;
-	width: 90%;
 }
 
 footer{

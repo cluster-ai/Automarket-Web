@@ -1,0 +1,219 @@
+
+
+/* GLOBAL */
+.grid{
+	display: grid;
+	grid-template-columns: 3fr 6fr 4fr;
+	grid-gap: 0.2em;
+	padding: 0.2em;
+}
+
+.grid > div{
+	color: #cccccc;
+	background-color: #363B3E;
+	padding: 1em;
+	padding-bottom: 0em;
+	border-top: 2em solid #474B4F;
+	border-radius: 1px;
+}
+
+.nested_grid{
+	color: #cccccc;
+	grid-gap: 1em;
+	border-radius: 2px;
+}
+
+.grid > div > nav, .grid section{
+	position: relative;
+	top: -2.6em;
+}
+
+.nested_grid, .grid section{
+	top: -1.6em;
+}
+
+.axis path, .axis line{
+	stroke: #6B6E70;
+}
+
+.axis text{
+	fill: #6B6E70;
+}
+
+.gridlines{
+	stroke: #6B6E70;
+	stroke-opacity: 0.7;
+	shape-rendering: crispEdges;
+}
+
+.vl{
+	border-left: 1px solid #474B4F;
+	height: 100%;
+	float: left;
+}
+
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #6B6E70;
+  border: 0;
+  margin: 0;
+  outline: none;
+  opacity: 0.7;
+}
+.slider:hover {
+  opacity: 1;
+}
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; 
+  appearance: none;
+  width: 8px;
+  height: 20px;
+  background: #86C232;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 8px;
+  height: 20px;
+  background: #86C232;
+  cursor: pointer;
+}
+
+
+/* GRID BOXES */
+#sidebar{
+	padding: 0;
+}
+
+#sidebar > nav{
+	margin-top: 1em;
+	margin-left: 0.8em;
+}
+
+#sidebar section{
+	display: grid;
+	grid-template-columns: 47px auto;
+	grid-gap: 0.3em;
+	margin-top: -0.85em;
+	height: 100%;
+}
+
+#sidebar table{
+	color: #6B6E70;
+	text-align: left;
+	border-spacing: 0 2px;
+	margin-right: 4px;
+}
+
+#sidebar table th{
+	font-size: 12px;
+	padding: 2px;
+}
+
+#sidebar table td{
+	color: #cccccc;
+	font-size: 12px;
+	padding: 2px;
+	cursor: pointer;
+}
+
+#sidebar .tablerow:hover{
+	background-color: #474B4F;
+}
+
+#sidebar_tab{
+	height: 100%;
+	background-color: #474B4F;
+}
+
+#sidebar_tab button{
+	color: #cccccc;
+	font-size: 12px;
+	text-align: right;
+	width: 100%;
+	background-color: #474B4F;
+	text-transform: uppercase;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	border: 0;
+}
+#sidebar_tab button:hover{
+	background-color: #363B3E;
+	border-left: 2px solid #86C232;
+}
+
+#graph_box{
+	grid-column: 2/4;
+	padding: 0;
+}
+
+#graph_box > nav{
+	margin-top: 1em;
+	margin-left: 0.8em;
+}
+
+#graph_box section{
+	display: grid;
+	margin-top: -2.5em;
+}
+
+#graph{
+	position: static;
+}
+
+#control_box{
+	grid-column: 2/3;
+}
+
+#control_box .nested_grid{
+	display: grid;
+	grid-template-columns: 3fr 0 1fr;
+	grid-gap: 1em;
+}
+
+#control_box .vl{
+	grid-column: 2/3;
+}
+
+#control_box #checkboxes{
+	position: static;
+	width: 9.6em;
+	grid-column: 3/4;
+	grid-row: 1/2;
+}
+
+#control_box #checkboxes input{
+	cursor: pointer;
+}
+
+#display_box{
+	grid-column: 3/4;
+}
+
+#display_box #data_selector{
+	text-align: center;
+}
+
+#display_box #data_selector p{
+	color: #cccccc;
+	margin: 0;
+	margin-bottom: 0.5em;
+}
+
+#display_box #data_selector button{
+	background-color:#363B3E;
+	border: 2px solid #222629;
+	color: #6B6E70;
+	margin-top: 2px;
+	margin-bottom: 2px;
+	font-size: 15px;
+}
+#display_box #data_selector button:hover{
+	background-color:#6B6E70;
+	border: 2px solid #474B4F;
+	color: #cccccc;
+}

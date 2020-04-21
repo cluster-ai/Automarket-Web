@@ -1,0 +1,116 @@
+
+<head>
+	<meta charset='utf-8'>
+	<meta name="viewport" content="width=device-width">
+	<title>Automarket - Demo</title>
+	{% load static %} 
+	<link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'main/css/demo.css' %}">
+
+	<script src="https://d3js.org/d3.v4.js"></script>
+</head>
+<body>
+
+	<section class="grid">
+		<div id="sidebar">
+			<nav>
+				Sidebar
+			</nav>
+			<section>
+				<nav id="sidebar_tab">
+					<ul>
+						<li><button>BTC</button></li>
+						<li><button>USDT</button></li>
+						<li><button>ETH</button></li>
+					</ul>
+				</nav>
+				<table cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<th>exhange</th>
+						<th>start</th>
+						<th style="text-align: right">end</th>
+					</tr>
+					<tr class="tablerow" onclick="func()">
+						<td>KRAKEN</td>
+						<td>3/13</td>
+						<td style="text-align: right">1/17</td>
+					</tr>
+					<tr class="tablerow" onclick="func()">
+						<td>BINANCE</td>
+						<td>11/14</td>
+						<td style="text-align: right">4/18</td>
+					</tr>
+					<tr class="tablerow" onclick="func()">
+						<td>COINBASE</td>
+						<td>9/12</td>
+						<td style="text-align: right">10/20</td>
+					</tr>
+					<tr class="tablerow" onclick="func()">
+						<td>DERIBIT</td>
+						<td>8/15</td>
+						<td style="text-align: right">2/19</td>
+					</tr>
+				</table>
+			</section>
+		</div>
+		<div id="graph_box">
+			<nav>
+				Graph Box
+			</nav>
+			<section id="graph">
+				{% load static %}
+				<script src="{% static 'main/js/demo_graph.js' %}"></script>
+			</section>
+			<div style="padding: 1em">
+  				<input type="range" min="1" max="200" value="100" class="slider">
+			</div>
+		</div>
+		<div id="control_box">
+			<nav>
+				Control Box
+			</nav>
+			<section class="nested_grid">
+				<div class="vl"></div>
+				<section id="checkboxes">
+					<div>
+						<input type="checkbox" name="normalize">
+						<label for="normalize">Normalize Data</label>
+					</div>
+					<div>
+						<input type="checkbox" name="scale">
+						<label for="scale">Scale Data</label>
+					</div>
+				</section>
+			</section>
+		</div>
+		<div id="display_box">
+			<nav>
+				Display Box
+			</nav>
+			<section>
+				<div id="data_selector">
+					<p>KRAKEN_BTC_5MIN</p>
+					<ul>
+						<button>price_high</button>
+						<button>price_low</button>
+						<button>price_open</button>
+						<button>price_close</button>
+						<button>trades_count</button>
+						<button>volume_traded</button>
+						<button>market_cap</button>
+					</ul>
+				</div>
+			</section>
+		</div>
+	</section>
+
+	{% if messages %}
+		{% for message in messages %}
+			<script>
+				alert('{{message}}')
+			</script>
+		{% endfor %}
+	{% endif %}
+
+</body>

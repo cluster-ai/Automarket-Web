@@ -1,19 +1,11 @@
 
-{% extends "main/header.html" %}
-
 {% block content %}
-<section class="container">
-	<br><br><br>
-	<form class="form">
-		<label for='email'>Enter Email</label>
-		<br><br>
-		<input type='text' id='email' placeholder='email'>
-		<br><br>
-		<label for='password'>Enter Password</label>
-		<br><br>
-		<input type='text' id='password' placeholder='password'>
-		<br><br>
-		<button class="btn">Login</button>
+<section class="container" id="demo_login" style="visibility:hidden;">
+	<form method="POST" class="form" id="demo_form">
+		{% csrf_token %}
+		{{form.as_p}}
+		<br>
+		<button type="submit" class="btn">Submit</button>
 	</form>
 </section>
 {% endblock %}
