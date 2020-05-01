@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="{% static 'main/css/demo.css' %}">
 
 	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 </head>
 <body>
 
@@ -19,38 +20,75 @@
 			</nav>
 			<section>
 				<nav id="sidebar_tab">
-					<ul>
-						<li><button>BTC</button></li>
-						<li><button>USDT</button></li>
-						<li><button>ETH</button></li>
+					<ul id="sidebar_list">
+						<script type="text/javascript">
+							function load_sidebar_tab(data) {
+								for (var exchange_id in data) {
+									//creates a button in a li with exchange_id as text
+									var node = document.createElement("LI");
+									var button = document.createElement("BUTTON");
+									button.onclick = function() {load_sidebar_table(data[exchange_id]);};
+									button.appendChild(document.createTextNode(exchange_id));
+									node.appendChild(button);
+									document.getElementById("sidebar_list").appendChild(node);
+								}
+							}
+						</script>
 					</ul>
 				</nav>
-				<table cellpadding="0" cellspacing="0" border="0">
-					<tr>
-						<th>exhange</th>
-						<th>start</th>
-						<th style="text-align: right">end</th>
-					</tr>
-					<tr class="tablerow" onclick="func()">
-						<td>KRAKEN</td>
-						<td>3/13</td>
-						<td style="text-align: right">1/17</td>
-					</tr>
-					<tr class="tablerow" onclick="func()">
-						<td>BINANCE</td>
-						<td>11/14</td>
-						<td style="text-align: right">4/18</td>
-					</tr>
-					<tr class="tablerow" onclick="func()">
-						<td>COINBASE</td>
-						<td>9/12</td>
-						<td style="text-align: right">10/20</td>
-					</tr>
-					<tr class="tablerow" onclick="func()">
-						<td>DERIBIT</td>
-						<td>8/15</td>
-						<td style="text-align: right">2/19</td>
-					</tr>
+				<table id='sidebar_table' cellpadding="0" cellspacing="0" border="0">
+					<script type="text/javascript">
+						function load_sidebar_table(coins) {
+							var table = document.getElementById('sidebar_table')
+							//clears table
+							while (table.hasChildNodes()) {
+								table.removeChild(table.firstChild);
+							};
+							//populates table
+							//first row is the title
+							var row = document.createElement('TR');
+							//left column
+							var left_col = document.createElement('TH');
+							left_col.className = 'left_col';
+							left_col.appendChild(document.createTextNode('coin'));
+							row.appendChild(left_col);
+							//center column
+							var center_col = document.createElement('TH');
+							center_col.className = 'center_col';
+							center_col.appendChild(document.createTextNode('start'));
+							row.appendChild(center_col);
+							//right column
+							var right_col = document.createElement('TH');
+							right_col.className = 'right_col';
+							right_col.appendChild(document.createTextNode('end'));
+							row.appendChild(right_col);
+
+							table.appendChild(row);
+
+							//table body
+							for (var i = 0; i < coins.length; i++) {
+								var row = document.createElement('TR');
+								row.className = 'table_body'
+								//left column
+								var left_col = document.createElement('TD');
+								left_col.className = 'left_col';
+								left_col.appendChild(document.createTextNode(coins[i]['coin']));
+								row.appendChild(left_col);
+								//center column
+								var center_col = document.createElement('TD');
+								center_col.className = 'center_col';
+								center_col.appendChild(document.createTextNode(coins[i]['start']));
+								row.appendChild(center_col);
+								//right column
+								var right_col = document.createElement('TD');
+								right_col.className = 'right_col';
+								right_col.appendChild(document.createTextNode(coins[i]['end']));
+								row.appendChild(right_col);
+
+								table.appendChild(row);
+							};
+						};
+					</script>
 				</table>
 			</section>
 		</div>
@@ -60,7 +98,7 @@
 			</nav>
 			<section id="graph">
 				{% load static %}
-				<script src="{% static 'main/js/demo_graph.js' %}"></script>
+				<script src="{% static 'main/js/demo/graph.js' %}"></script>
 			</section>
 			<div style="padding: 1em">
   				<input type="range" min="1" max="200" value="100" class="slider">
@@ -104,6 +142,19 @@
 			</section>
 		</div>
 	</section>
+
+	<script type="text/javascript">
+		$.ajax({
+			url: 'sidebar_content/',
+			data: {},
+			dataType: 'json',
+			success: function (data) {
+				load_sidebar_tab(data);
+				//load_sidebar_table(data);
+			}
+		});
+	</script>
+
 
 	{% if messages %}
 		{% for message in messages %}

@@ -4,3 +4,4 @@ env/
 project/
 **/migrations/
 **/__pycache__/
+tutorials/

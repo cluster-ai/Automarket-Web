@@ -96,7 +96,7 @@
 
 #sidebar section{
 	display: grid;
-	grid-template-columns: 47px auto;
+	grid-template-columns: 78px auto;
 	grid-gap: 0.3em;
 	margin-top: -0.85em;
 	height: 100%;
@@ -112,6 +112,7 @@
 #sidebar table th{
 	font-size: 12px;
 	padding: 2px;
+	width: 33.3%;
 }
 
 #sidebar table td{
@@ -119,9 +120,22 @@
 	font-size: 12px;
 	padding: 2px;
 	cursor: pointer;
+	width: 33.3%;
 }
 
-#sidebar .tablerow:hover{
+#sidebar table .left_col {
+	text-align: left;
+}
+
+#sidebar table .center_col {
+	text-align: left;
+}
+
+#sidebar table .right_col {
+	text-align: right;
+}
+
+#sidebar .table_body:hover{
 	background-color: #474B4F;
 }
 

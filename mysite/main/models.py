@@ -10,6 +10,11 @@ class DemoKey(models.Model):
 	class Meta:
 		verbose_name_plural = 'Demo Keys'
 
+'''
+class TrackedExchange(models.Model):
+	exchange_id = models.CharField(max_length=200)
+'''
+
 
 class HistoricalData(models.Model):
 	index_id = models.CharField(max_length=200)
@@ -31,46 +36,16 @@ class HistoricalData(models.Model):
 	class Meta:
 		verbose_name_plural = 'Historical Data'
 
-'''
-class HistoricalData(models.Model):
-	index_id = models.CharField(max_length=100)
-	symbol_id = models.CharField(max_length=100)
-	exchange_id = models.CharField(max_length=100)
-	asset_id_quote = models.CharField(max_length=100)
-	asset_id_base = models.CharField(max_length=100)
-	period_id = models.CharField(max_length=100)
-	time_increment = models.PositiveIntegerField()
-	data_points = models.PositiveIntegerField()
-	data_start = models.CharField(max_length=100)
-	data_end = models.CharField(max_length=100)
+
+class ApiKey(models.Model):
+	name = models.CharField(max_length=200, default=1)
+	key = models.CharField(max_length=200)
+	limit = models.CharField(max_length=200)
+	remaining = models.CharField(max_length=200)
+	reset = models.CharField(max_length=200)
 
 	def __str__(self):
-		return self.index_id
+		return self.name
 
 	class Meta:
-		verbose_name_plural = "Historical Index"
-
-
-class HistoricalData(models.Model):
-	index = models.OneToOneField(
-		HistoricalIndex,
-		on_delete=models.CASCADE,
-		primary_key=False
-	)
-	time_period_start = models.PositiveIntegerField()
-	time_period_end = models.PositiveIntegerField()
-	price_high = models.PositiveIntegerField()
-	price_low = models.PositiveIntegerField()
-	price_open = models.PositiveIntegerField()
-	price_close = models.PositiveIntegerField()
-	volume_traded = models.PositiveIntegerField()
-	trades_count = models.PositiveIntegerField()
-	market_cap = models.PositiveIntegerField()
-	is_nan = models.BooleanField()
-
-	def __str__(self):
-		return self.index.index_id
-
-	class Meta:
-		verbose_name_plural = "Historical Data"
-	'''
+		verbose_name_plural = 'API Keys'
