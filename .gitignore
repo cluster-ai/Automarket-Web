@@ -5,3 +5,4 @@ project/
 **/migrations/
 **/__pycache__/
 tutorials/
+*test.py

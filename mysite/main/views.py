@@ -3,13 +3,19 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse
 from django.core import serializers
+from django.conf import settings
 
+import os
 import json
 import datetime
 
 #local
 from .forms import DemoLogin
 from .models import DemoKey, HistoricalData, ApiKey
+
+from .market_data import historical, init_dir
+init_dir()
+historical('KRAKEN_BTC_5MIN')
 
 # Create your views here.
 
@@ -47,7 +53,7 @@ def sidebar_content(request):
 		unix = datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.0000000Z')
 		unix = int(unix.replace(tzinfo=datetime.timezone.utc).timestamp())
 		date = datetime.datetime.utcfromtimestamp(unix)
-		return date.strftime('%b/%y')
+		return date.strftime("%b %Y")
 	
 	data = {}
 	for item in raw_data:
