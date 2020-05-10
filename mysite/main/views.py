@@ -14,8 +14,6 @@ from .forms import DemoLogin
 from .models import DemoKey, HistoricalData, ApiKey
 
 from .market_data import historical, init_dir
-init_dir()
-historical('KRAKEN_BTC_5MIN')
 
 # Create your views here.
 
