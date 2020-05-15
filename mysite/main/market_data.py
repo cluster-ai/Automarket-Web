@@ -138,7 +138,7 @@ def load_data(index_id, start_time=None, end_time=None):
 	index_data = HistoricalData.objects.get(index_id=index_id)
 
 	#loads all data from file
-	data = pd.read_csv(f'{HISTORICAL_DIR}/{index_data.file_path}')
+	data = pd.read_csv(os.path.join(HISTORICAL_DIR, index_data.file_path))
 
 	#makes data.index equal to 'time_period_start' column
 	data.set_index('time_period_start', drop=False, inplace=True)
@@ -209,11 +209,11 @@ class Historical():
 			#headers given from new request
 			for header, value in headers.items():
 				#if a header matches, update that value in database
-				if 'limit' in header:
+				if 'x-ratelimit-limit' in header:
 					ApiKey.objects.filter(name=key_id).update(limit=value)
-				elif 'remaining' in header:
+				elif 'x-ratelimit-remaining' in header:
 					ApiKey.objects.filter(name=key_id).update(remaining=value)
-				elif 'reset' in header:
+				elif 'x-ratelimit-reset' in header:
 					ApiKey.objects.filter(name=key_id).update(reset=value)
 
 
@@ -398,7 +398,7 @@ class Historical():
 			return response
 
 
-	def backfill(cls, key_id, index_id, limit=None):
+	def backfill(key_id, index_id, limit=None):
 		'''
 		backfills historical data for specified index_id 
 		and saves it to database
@@ -414,7 +414,7 @@ class Historical():
 		init_time = time.time()
 
 		#updates specified api key
-		cls.update_key(key_id)
+		Historical.update_key(key_id)
 
 		#loads the api key information
 		key_index = ApiKey.objects.get(name=key_id)
@@ -424,17 +424,19 @@ class Historical():
 		time_start = date_to_unix(hist_index.data_end)#unix time
 		#loads the end time for request (latest increment time value)
 		remainder = init_time % hist_index.time_increment
-		time_end = init_time - remainder
+		data_end = init_time - remainder
 
 		#verifies given limit is valid
-		if limit < 0:
+		if limit == None:
+			limit = key_index.remaining*100
+		elif limit < 0:
 			#limit is negative
 			raise ValueError(f'limit cannot be negative')
 		elif isinstance(limit, int) == False:
 			#limit is not an int
 			limit_tp = type(limit)
 			raise ValueError(f'limit cannot be {limit_tp}, must be int')
-		elif limit > key_index.remaining:
+		elif limit > int(key_index.remaining):
 			#given limit is larger than remaining requests for key_id
 			print('WARNING: given limit exceeds available requests')
 			limit = key_index.remaining
@@ -442,19 +444,30 @@ class Historical():
 		#generates request parameters
 		queries = {
 			'limit': limit,
-			'time_start': unix_to_date(time_start),
-			'time_end': unix_to_date(time_end),
+			'time_start': hist_index.data_end,
+			'time_end': unix_to_date(data_end),
 			'period_id': hist_index.period_id
 		}
 
 		#load url
-		url = cls.historical_url.substitute(
+		url = Historical.historical_url.substitute(
 					symbol_id=hist_index.symbol_id)
 
 		#make the api request
-		response = cls.request(key_id, url=url, queries=queries)
+		response = Historical.request(key_id, url=url, queries=queries)
+
+		#determines interval of response
+		if hist_index.data_points == 0:
+			#no data exists, creates custom start time
+			time_start = date_to_unix(response[0]['time_period_start'])
+		else:
+			#data exists, use last value
+			time_start = date_to_unix(hist_index.data_end)
+		time_end = date_to_unix(response[-1]['time_period_end'])
+		print(f'time_end: {time_end} | time_start: {time_start}')
+
 		#converts response to pandas dataframe
-		df = pd.DataFrame.from_dict(response.json(), 
+		df = pd.DataFrame.from_dict(response, 
 										  orient='columns')
 
 		#verifies df has data and converts dates to unix
@@ -474,6 +487,8 @@ class Historical():
 						#
 						#converts date to unix
 						df.at[index, col] = date_to_unix(row[col])
+
+			print('one')
 
 			#calculates price_average column
 			price_low = df.loc[:, 'price_low'].values
@@ -509,33 +524,43 @@ class Historical():
 
 		#creates an empty dataframe (full_df) with no missing 
 		#indexes, start and end times match request queries
-		datapoints = (time_end - time_start) / hist_index.time_increment
-		index = range(datapoints) + time_start
+		data_points = int((time_end - time_start) / hist_index.time_increment)
+		index = np.multiply(range(data_points), hist_index.time_increment) + time_start
 		full_df = pd.DataFrame(columns=df.columns, index=index)
 
 		#load time_period_start data into column
 		full_df['time_period_start'] = full_df.index
 		#load time_period_end data into column
-		full_df['time_period_end'] = np.add(historical.index,
+		full_df['time_period_end'] = np.add(full_df.index,
 											   hist_index.time_increment)
 		#apply df data to full_df
 		full_df.update(df)
+		print(df)
+		print(full_df)
 		#set empty rows to isnan = True
-		new_df.isnan.fillna(True, inplace=True)
+		full_df.isnan.fillna(True, inplace=True)
 
 		#load existing data from database
-		existing_data = historical(index_id)
-		#combine existing data and historical
-		full_df = existing_data.append(full_df)
+		if hist_index.data_points > 0:
+			#data exists
+			existing_data = load_data(index_id)
+			#combine existing data and full_df
+			full_df = existing_data.append(full_df)
 
 		#saves new data to file
-		full_df.to_csv(filepath, index=False)
+		full_df.to_csv(hist_index.file_path, index=False)
 
 		#updates hist_index
-		hist_index.datapoints = len(full_df.index)
+		if hist_index.data_points == 0:
+			print('HERE: WORKS')
+			#no data exists, update data start to match data
+			hist_index.data_start = unix_to_date(time_start)
+			hist_index.save(update_fields=['data_start'])
+		hist_index.data_points = len(full_df.index)
 		hist_index.data_end = unix_to_date(time_end)
+
 		#commits changes to database
-		hist_index.save(update_fields=['datapoints', 'data_end'])
+		hist_index.save(update_fields=['data_points', 'data_end'])
 
 		print(f'\nDuration:', time.time() - init_time)
 		print('----------------------------------------------------')

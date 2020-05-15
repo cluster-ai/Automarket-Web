@@ -40,8 +40,8 @@ class HistoricalData(models.Model):
 class ApiKey(models.Model):
 	name = models.CharField(max_length=200, default=1)
 	key = models.CharField(max_length=200)
-	limit = models.CharField(max_length=200)
-	remaining = models.CharField(max_length=200)
+	limit = models.PositiveIntegerField()
+	remaining = models.PositiveIntegerField()
 	reset = models.CharField(max_length=200)
 
 	def __str__(self):

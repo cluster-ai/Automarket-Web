@@ -6,3 +6,4 @@ project/
 **/__pycache__/
 tutorials/
 *test.py
+*.csv
