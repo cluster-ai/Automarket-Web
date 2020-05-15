@@ -13,7 +13,11 @@ import datetime
 from .forms import DemoLogin
 from .models import DemoKey, HistoricalData, ApiKey
 
-from .market_data import historical, init_dir
+from .market_data import Historical, init_dir, load_data
+
+#Initializes market_data
+init_dir()
+Historical.add_item('KRAKEN', 'BTC', '5MIN', 300)
 
 # Create your views here.
 

@@ -9,6 +9,8 @@ import datetime
 import json
 import os
 from string import Template
+import requests
+from requests.exceptions import HTTPError
 
 #third-party
 import numpy as np
@@ -33,6 +35,8 @@ def init_dir():
 	###COINAPI_DIR###
 	if os.path.isdir(COINAPI_DIR) == False:
 		os.mkdir(COINAPI_DIR)
+
+	Historical.init()
 
 
 def unix_to_date(unix, show_dec=True):
@@ -96,7 +100,20 @@ def date_to_unix(date):
 	return unix
 
 
-def historical(index_id, start_time=None, end_time=None):
+def create_index_id(exchange_id, coin_id, period_id):
+	'''
+	generates an index_id based on arguments
+
+	Parameters:
+		exchange_id    : (str) name of exchange in bold: 'KRAKEN'
+		coin_id        : (str) crytpocurrency id: 'BTC'
+		period_id      : (str) time increment of data in coinapi
+							   period_id format
+	'''
+	return f'{exchange_id}_{coin_id}_{period_id}'
+
+
+def load_data(index_id, start_time=None, end_time=None):
 	'''
 	Returns dataframe for the specified historical data
 
@@ -157,6 +174,12 @@ class Historical():
 	asset_id_quote = 'USD'
 
 
+	def init():
+		#initializes files if any are missing
+		if os.path.exists(COIN_INDEX_PATH) == False:
+			Historical.reload_coins('free_key')
+
+
 	def update_key(key_id, headers=None):
 		'''
 		Updates the X-RateLimit-[limit, remaining, reset] data in 
@@ -194,6 +217,66 @@ class Historical():
 					ApiKey.objects.filter(name=key_id).update(reset=value)
 
 
+	def filter(request, filters, remaining=False):
+		'''
+		Parameters:
+			request   : (list of dicts) coinapi json request data
+			filters   : (dict) dict of filters that need to be passed
+							   for data to be added to filtered
+			remaining : (bool) returns remaining instead of filtered if True
+
+		NOTE: each item needs to pass ALL filters to be in filtered,
+		The rest is appended to remaining
+		'''
+
+		if filters == {}:
+			print('NOTICE: no filters given, returning items')
+			return request
+
+		#prints filter request config to console
+		print('Request Filters:')
+		for key, val in filters.items():
+			print(f'   - {key} | {val}')
+
+		#filtered items have passed all given filters
+		filtered_items = []
+		#remaining items have failed at least one filter
+		remaining_items = []
+
+		#total items in request
+		total = len(request)
+		print(f'filtering {total} items')
+
+		#iterates through request items for filtering
+		for item in request:
+			mismatch = False #default val is False
+
+			#iterates through each filter for current item
+			for filter_key, filter_val in filters.items():
+				if filter_key in item:
+					#current item has the filter key
+					if item[filter_key] != filter_val:
+						#value of item does not match current filter
+						mismatch = True
+				else:
+					#item does not have filter_key
+					mismatch = True
+
+			if mismatch == False:
+				#item passed all filteres
+				filtered_items.append(item)
+			else:
+				#item did not pass all filters
+				remaining_items.append(item)
+
+		if remaining == True:
+			print('Notice: returning remaining items')
+			return remaining_items
+
+		print('Notice: returning filtered items')
+		return filtered_items
+
+
 	def add_item(exchange_id, coin_id, period_id, time_increment):
 		'''
 		Adds historical item to Database.historical_index
@@ -214,51 +297,46 @@ class Historical():
 			return None
 
 		#the first dir is the period_id associated to time_increment
-		file_path = Database.historical_dir + f'/{period_id}'
-		if os.path.isdir(file_path) == False:
+		file_path = os.path.join(HISTORICAL_DIR, f'{period_id}')
+		if os.path.exists(file_path) == False:
 			os.mkdir(file_path)
 		#the final dir is the coin_id
-		file_path += f'/{exchange_id}'
+		file_path = os.path.join(file_path, exchange_id)
 		if os.path.isdir(file_path) == False:
 			os.mkdir(file_path)
 
 		#loads coin_data for new index_item
-		data = pd.read_csv(COIN_INDEX_PATH)
-		coin_data = None
-		for index_item in data:
-			if index_item['exchange_id'] == exchange_id:
-				#exchange and coin matches
-				coin_data = index_item
-				break
+		with open(COIN_INDEX_PATH, 'r') as file:
+			data = json.load(file)
+		coin_data = data[exchange_id][coin_id]
 
 		#filename-example: 'KRAKEN_BTC_5MIN.csv'
 		file_name = f'{index_id}.csv'
-		file_path = file_path + f'/{file_name}' #adds filename to dir
-		#creates file if there is none
-		if os.path.exists(file_path) == False:
-			open(file_path, 'w')
+		file_path = os.path.join(file_path, file_name) #adds filename to dir
+		#reloads file whether there is one already or not
+		open(file_path, 'w')
 
 		#create new historical data object
-		new_item = HistoricalData.objects.create(index_id='index_id')
-		#fills out required information
-		new_item.filename = file_name
-		new_item.file_path = file_path,
-		new_item.symbol_id = coin_data['symbol_id']
-		new_item.exchange_id = exchange_id
-		new_item.asset_id_quote = coin_data['asset_id_quote']
-		new_item.asset_id_base = coin_data['asset_id_base']
-		new_item.period_id = period_id
-		new_item.time_increment = time_increment
-		new_item.datapoints = 0
-		new_item.data_start = coin_data['data_start']
-		new_item.data_end = coin_data['data_start']#not a typo\
-		#saves changes to file
+		new_item = HistoricalData.objects.create(
+			index_id=index_id,
+			file_name = file_name,
+			file_path = file_path,
+			symbol_id = coin_data['symbol_id'],
+			exchange_id = exchange_id,
+			asset_id_quote = coin_data['asset_id_quote'],
+			asset_id_base = coin_data['asset_id_base'],
+			period_id = period_id,
+			time_increment = time_increment,
+			data_points = 0,
+			data_start = coin_data['data_start'],
+			data_end = coin_data['data_start']
+		)
 		new_item.save()
 
 		print(f'Added {index_id} to Historical Data...')
 
 
-	def request(cls, key_id, url='', queries={}, 
+	def request(key_id, url='', queries={}, 
 				filters={}, remaining=False):
 		'''
 		Parameters:
@@ -277,14 +355,14 @@ class Historical():
 		'''
 
 		#update api key index in database
-		cls.update_key(key_id)
+		Historical.update_key(key_id)
 
 		#creates a local api index with only "key_id" data 
 		key_index = ApiKey.objects.get(name=key_id)
 
 		try:
 			print("\nMaking API Request at:", url)
-			response = requests.get(url, headers=key_index.api_key, 
+			response = requests.get(url, headers={'X-CoinAPI-Key': key_index.key},
 									params=queries)
 			# If the response was successful, no Exception will be raised
 			response.raise_for_status()
@@ -304,14 +382,14 @@ class Historical():
 			print(f'API Request Successful: code {response.status_code}')
 			
 			#updates key_index rate limit information in database 
-			cls.update_key(key_id, response.headers)
+			Historical.update_key(key_id, response.headers)
 
 			#converts response to json
 			response = response.json()
 
 			#response is converted to json and filtered
 			if filters != {}:
-				response = cls.filter(response, filters, remaining)
+				response = Historical.filter(response, filters, remaining)
 			else:
 				print('NOTICE: no filter')
 
@@ -463,7 +541,7 @@ class Historical():
 		print('----------------------------------------------------')
 
 
-	def reload_coins(cls, key_id):
+	def reload_coins(key_id):
 		'''
 		Parameters:
 			key_id : (str) name of api_key to use for request
@@ -483,33 +561,36 @@ class Historical():
 		init_time = time.time()
 
 		#requests all currency data and filters by USD
-		response = request(key_id, url=cls.coin_url,
-								   filters={'asset_id_quote': 'USD'})
+		response = Historical.request(key_id, url=Historical.coin_url,
+								   filters={'asset_id_quote': 'USD',
+								   			'symbol_type': 'SPOT'})
 
 		#sets index to empty dict
 		coin_index = {}
 
 		#iterates through coins and adds them to coin_index by exchange
-		#if exchanges are added as needed
 		for item_index in response:
 
 			#loads coin_id from item_index
+			exchange_id = item_index['exchange_id']
 			coin_id = item_index['asset_id_base']
 
+			#skips items without the data interval
+			if ('data_start' not in item_index or 
+					'data_end' not in item_index):
+				continue
+
 			#determines if exchange exists in coin_index
-			if coin_id not in coin_index:
+			if exchange_id not in coin_index:
 				#coin_id not found in coin_index
 				#
 				#creates new coin and adds it to coin_index
-				coin_index.update({coin_id: []})
+				coin_index.update({exchange_id: {}})
 			
 			#adds item_index to coin_index
-			coin_index[coin_id].append(item_index)
+			coin_index[exchange_id].update({coin_id: item_index})
 
 		#saves coin_index to file
-		if os.path.exists(COIN_INDEX_PATH) == False:
-			open(COIN_INDEX_PATH, 'w')
-
 		with open(COIN_INDEX_PATH, 'w') as file:
 			json.dump(coin_index, file, indent=4)
 
