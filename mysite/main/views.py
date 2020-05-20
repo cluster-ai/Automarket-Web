@@ -1,7 +1,7 @@
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.core import serializers
 from django.conf import settings
 
@@ -16,8 +16,7 @@ from .models import DemoKey, HistoricalData, ApiKey
 from .market_data import Historical, init_dir, load_data
 
 #Initializes market_data
-init_dir()
-Historical.backfill('startup_key', 'KRAKEN_BTC_5MIN')
+#Historical.backfill('startup_key', 'KRAKEN_ETH_5MIN')
 
 # Create your views here.
 
@@ -46,7 +45,18 @@ def demo_page(request):
 				  'main/demo.html')
 
 
-def sidebar_content(request):
+def display_box(request):
+	if request.method == 'POST':
+		request_index_id = request.POST.get('index_id', None)
+
+		#loads the corresponding df
+		columns = load_data(request_index_id).columns
+		print(columns)
+
+		return JsonResponse({'columns': columns})
+
+
+def sidebar(request):
 	raw_data = HistoricalData.objects.all()
 	raw_data = json.loads(serializers.serialize('json', raw_data))
 
@@ -60,28 +70,37 @@ def sidebar_content(request):
 	data = {}
 	for item in raw_data:
 		exchange_id = item['fields']['exchange_id']
+
+		#items being sent
+		index_id = item['fields']['index_id']
 		coin = item['fields']['asset_id_base']
 		start = convert_date(item['fields']['data_start'])
 		end = convert_date(item['fields']['data_end'])
+
 		#does item exchange exist in data
 		if exchange_id not in data:
 			#exchange_id does not exist in data
 			data.update({exchange_id: []})
 
 		#append currency
-		data[exchange_id].append({'coin': coin,
-									'start': start,
-									'end': end})
+		data[exchange_id].append({
+			'index_id': index_id,
+			'coin': coin,
+			'start': start,
+			'end': end
+		})
 	'''
 	new data format:
 	data = {
 		'exchange_1': [
 			{
+				'index_id': 'KRAKEN_BTC_5MIN',
 				'coin': 'coin1',
 				'start': 'mm/yy',
 				'end': 'mm/yy'
 			},
 			{
+				'index_id': 'KRAKEN_ETH_5MIN',
 				'coin': 'coin1',
 				'start': 'mm/yy',
 				'end': 'mm/yy'
@@ -94,4 +113,4 @@ def sidebar_content(request):
 	}
 	'''
 
-	return HttpResponse(json.dumps(data))
+	return JsonResponse(data)

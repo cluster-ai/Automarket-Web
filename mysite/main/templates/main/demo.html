@@ -22,12 +22,30 @@
 				<nav id="sidebar_tab">
 					<ul id="sidebar_list">
 						<script type="text/javascript">
+							function toggle_tab_btn(clicked_btn) {
+								var nodes = document.getElementById('sidebar_list')
+								for (var i = 0; i < nodes.length; i++) {
+									//a list item should only have one child: button
+									var button = children[i].fistElementChild;
+									//pull item id
+									var id = button.id;
+									//set classes to none
+									document.getElementById(id).className = '';
+								}
+								//sets the clicked buttons class to clicked
+								document.getElementById(clicked_btn).className = 'clicked';
+							}
+
 							function load_sidebar_tab(data) {
 								for (var exchange_id in data) {
 									//creates a button in a li with exchange_id as text
 									var node = document.createElement("LI");
 									var button = document.createElement("BUTTON");
-									button.onclick = function() {load_sidebar_table(data[exchange_id]);};
+									button.id = exchange_id + '_tab'
+									button.onclick = function() {
+										load_sidebar_table(data[exchange_id]);
+										toggle_tab_btn(this.id);
+									};
 									button.appendChild(document.createTextNode(exchange_id));
 									node.appendChild(button);
 									document.getElementById("sidebar_list").appendChild(node);
@@ -38,6 +56,18 @@
 				</nav>
 				<table id='sidebar_table' cellpadding="0" cellspacing="0" border="0">
 					<script type="text/javascript">
+						function toggle_table_btn(clicked_btn) {
+							var table = document.getElementById('sidebar_table')
+							for (var i = 0, row; row = table.rows[i]; i++) {
+								//reset classes for table_body
+								if (row.id != 'top_row'){
+									document.getElementById(row.id).className = 'table_body'
+								}
+							}
+							//sets the clicked buttons class to clicked
+							document.getElementById(clicked_btn).className = 'table_body clicked';
+						}
+
 						function load_sidebar_table(coins) {
 							var table = document.getElementById('sidebar_table')
 							//clears table
@@ -47,6 +77,7 @@
 							//populates table
 							//first row is the title
 							var row = document.createElement('TR');
+							row.id = 'top_row'
 							//left column
 							var left_col = document.createElement('TH');
 							left_col.className = 'left_col';
@@ -69,6 +100,12 @@
 							for (var i = 0; i < coins.length; i++) {
 								var row = document.createElement('TR');
 								row.className = 'table_body'
+								row.id = coins[i]['index_id']
+								row.onclick = function() {
+									//this.id == index_id
+									toggle_table_btn(this.id);
+									load_display_box(this.id);
+								}
 								//left column
 								var left_col = document.createElement('TD');
 								left_col.className = 'left_col';
@@ -128,24 +165,68 @@
 			</nav>
 			<section>
 				<div id="data_selector">
-					<p>KRAKEN_BTC_5MIN</p>
-					<ul>
-						<button>price_high</button>
-						<button>price_low</button>
-						<button>price_open</button>
-						<button>price_close</button>
-						<button>trades_count</button>
-						<button>volume_traded</button>
-						<button>market_cap</button>
-					</ul>
+					<script type="text/javascript">
+						function populate_display_box(columns) {
+							//clears div
+							var div = document.getElementById('data_selector');
+							while (div.hasChildNodes()) {
+								div.removeChild(table.firstChild);
+							};
+
+							//index_id label
+							var label = document.createElement('P');
+							label.appendChild(document.createTextNode(index_id));
+							div.appendChild(label)
+
+							//ul of buttons, each corresponding to a data 
+							//column in market data for given index_id
+							var btn_list = document.createElement('ul');
+							//creates a button for each column
+							for (var i = 0; i < columns.length; i++) {
+								var button = document.createElement('BUTTON');
+								button.appendChild(document.createTextNode(columns[i]));
+								btn_list.appendChilde(button);
+							}
+							div.appendChild(btn_list);
+						}
+
+						function load_display_box(index_id) {
+							$.ajax({
+								url: 'display_box/',
+								data: {'index_id': index_id},
+								dataType: 'json',
+								type: 'POST',
+								success: function (data) {
+									var columns = data.columns;
+									populate_display_box(columns);
+								}
+							})
+						}
+					</script>
 				</div>
 			</section>
 		</div>
 	</section>
 
 	<script type="text/javascript">
+		var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+		function csrfSafeMethod(method) {
+			// these HTTP methods do not require CSRF protection
+			return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+		}
+
+		$.ajaxSetup({
+			beforeSend: function (xhr, settings) {
+				// if not safe, set csrftoken
+				if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+					xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				}
+			}
+		});
+
 		$.ajax({
-			url: 'sidebar_content/',
+			url: 'sidebar/',
 			data: {},
 			dataType: 'json',
 			success: function (data) {

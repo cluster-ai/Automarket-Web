@@ -535,8 +535,6 @@ class Historical():
 											   hist_index.time_increment)
 		#apply df data to full_df
 		full_df.update(df)
-		print(df)
-		print(full_df)
 		#set empty rows to isnan = True
 		full_df.isnan.fillna(True, inplace=True)
 
@@ -552,7 +550,6 @@ class Historical():
 
 		#updates hist_index
 		if hist_index.data_points == 0:
-			print('HERE: WORKS')
 			#no data exists, update data start to match data
 			hist_index.data_start = unix_to_date(time_start)
 			hist_index.save(update_fields=['data_start'])
