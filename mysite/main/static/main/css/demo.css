@@ -94,7 +94,7 @@
 	margin-left: 0.8em;
 }
 
-#sidebar section{
+#sidebar > section{
 	display: grid;
 	grid-template-columns: 78px auto;
 	grid-gap: 0.3em;
@@ -102,43 +102,45 @@
 	height: 100%;
 }
 
-#sidebar table{
-	color: #6B6E70;
-	text-align: left;
-	border-spacing: 0 2px;
-	margin-right: 4px;
+#sidebar #table_label{
+	display: grid;
+	grid-template-columns: 11fr 19fr 19fr;
+	margin-right: 0.4em;
 }
 
-#sidebar table th{
+#sidebar #table_label div{
 	font-size: 12px;
-	padding: 2px;
-	width: 33.3%;
+	color: #6B6E70;
+	margin-top: 1.8em;
+	padding: 0.2em;
 }
 
-#sidebar table td{
+#sidebar #table_body div{
+	display: grid;
+	grid-template-columns: 11fr 19fr 19fr;
+	margin-right: 0.4em;
+}
+
+#sidebar #table_body div span{
 	color: #cccccc;
 	font-size: 12px;
 	padding: 2px;
 	cursor: pointer;
-	width: 33.3%;
 }
 
-#sidebar table .left_col {
+#sidebar .left_col {
 	text-align: left;
-	width: 22%;
 }
 
-#sidebar table .center_col {
+#sidebar .center_col {
 	text-align: center;
-	width: 38%;
 }
 
-#sidebar table .right_col {
+#sidebar .right_col {
 	text-align: right;
-	width: 38%;
 }
 
-#sidebar .table_row:hover{
+#sidebar .table_btn:hover{
 	background-color: #474B4F;
 }
 

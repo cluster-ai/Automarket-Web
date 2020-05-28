@@ -39,8 +39,8 @@
 							function load_sidebar_tab(data) {
 								for (var exchange_id in data) {
 									//creates a button in a li with exchange_id as text
-									var node = document.createElement("LI");
-									var button = document.createElement("BUTTON");
+									var node = document.createElement("li");
+									var button = document.createElement("button");
 									button.id = exchange_id + '_tab'
 									button.onclick = function() {
 										load_sidebar_table(data[exchange_id]);
@@ -54,79 +54,70 @@
 						</script>
 					</ul>
 				</nav>
-				<table id='sidebar_table' cellpadding="0" cellspacing="0" border="0">
-					<script type="text/javascript">
-						function toggle_table_btn(clicked_btn) {
-							var table = document.getElementById('sidebar_table')
-							for (var i = 0, row; row = table.rows[i]; i++) {
-								//reset classes for table_body
-								if (row.id != 'top_row'){
-									document.getElementById(row.id).className = 'table_body'
+				<div id='sidebar_table' cellpadding="0" cellspacing="0" border="0">
+					<section id="table_label">
+						<div class='left_col'>coin</div>
+						<div class='center_col'>start</div>
+						<div class='right_col'>end</div>
+					</section>
+					<section id='table_body'>
+						<script type="text/javascript">
+
+							function toggle_table_btn(clicked_btn) {
+								var table = document.getElementById('table_body')
+								for (var i = 0, row; row = table.rows[i]; i++) {
+									//reset classes for table_body
+									if (row.id != 'top_row'){
+										document.getElementById(row.id).className = 'table_btn'
+									}
 								}
+								//sets the clicked buttons class to clicked
+								document.getElementById(clicked_btn).className = 'table_btn clicked';
 							}
-							//sets the clicked buttons class to clicked
-							document.getElementById(clicked_btn).className = 'table_body clicked';
-						}
 
-						function load_sidebar_table(coins) {
-							var table = document.getElementById('sidebar_table')
-							//clears table
-							while (table.hasChildNodes()) {
-								table.removeChild(table.firstChild);
+							function load_sidebar_table(coins) {
+								var table = document.getElementById('table_body')
+								//clears table
+								while (table.hasChildNodes()) {
+									table.removeChild(table.firstChild);
+								};
+
+								//populate element with buttons
+
+								//table body
+								for (var i = 0; i < coins.length; i++) {
+									// this element is a div because "button" does
+									// not work properly with a nested css grid
+									var button = document.createElement('div');
+									button.className = 'table_btn'
+									button.id = coins[i]['index_id']
+
+									button.onclick = function() {
+										console.log(this.id)
+									}
+
+									//left column
+									var left_col = document.createElement('span');
+									left_col.className = 'left_col';
+									left_col.appendChild(document.createTextNode(coins[i]['coin']));
+									button.appendChild(left_col);
+									//center column
+									var center_col = document.createElement('span');
+									center_col.className = 'center_col';
+									center_col.appendChild(document.createTextNode(coins[i]['start']));
+									button.appendChild(center_col);
+									//right column
+									var right_col = document.createElement('span');
+									right_col.className = 'right_col';
+									right_col.appendChild(document.createTextNode(coins[i]['end']));
+									button.appendChild(right_col);
+
+									table.appendChild(button);
+								};
 							};
-							//populates table
-							//first row is the title
-							var row = document.createElement('TR');
-							row.id = 'top_row'
-							//left column
-							var left_col = document.createElement('TH');
-							left_col.className = 'left_col';
-							left_col.appendChild(document.createTextNode('coin'));
-							row.appendChild(left_col);
-							//center column
-							var center_col = document.createElement('TH');
-							center_col.className = 'center_col';
-							center_col.appendChild(document.createTextNode('start'));
-							row.appendChild(center_col);
-							//right column
-							var right_col = document.createElement('TH');
-							right_col.className = 'right_col';
-							right_col.appendChild(document.createTextNode('end'));
-							row.appendChild(right_col);
-
-							table.appendChild(row);
-
-							//table body
-							for (var i = 0; i < coins.length; i++) {
-								var row = document.createElement('TR');
-								row.className = 'table_row'
-								row.id = coins[i]['index_id']
-								/*row.onclick = function() {
-									//this.id == index_id
-									toggle_table_btn(this.id);
-									load_display_box(this.id);
-								}*/
-								//left column
-								var left_col = document.createElement('TD');
-								left_col.className = 'left_col';
-								left_col.appendChild(document.createTextNode(coins[i]['coin']));
-								row.appendChild(left_col);
-								//center column
-								var center_col = document.createElement('TD');
-								center_col.className = 'center_col';
-								center_col.appendChild(document.createTextNode(coins[i]['start']));
-								row.appendChild(center_col);
-								//right column
-								var right_col = document.createElement('TD');
-								right_col.className = 'right_col';
-								right_col.appendChild(document.createTextNode(coins[i]['end']));
-								row.appendChild(right_col);
-
-								table.appendChild(row);
-							};
-						};
-					</script>
-				</table>
+						</script>
+					</section>
+				</div>
 			</section>
 		</div>
 		<div id="graph_box">
@@ -174,7 +165,7 @@
 							};
 
 							//index_id label
-							var label = document.createElement('P');
+							var label = document.createElement('p');
 							label.appendChild(document.createTextNode(index_id));
 							div.appendChild(label)
 
@@ -264,7 +255,7 @@
 		});
 
 		// when a sidebar table_row is clicked, this is triggered
-		$('.sidebar_table').on('click', function(event){
+		$('#table_body').on('click', function(event){
 			event.preventDefault();
 			console.log("form submitted!") // sanity check
 			//create_post();
