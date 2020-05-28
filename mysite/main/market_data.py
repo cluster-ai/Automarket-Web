@@ -113,53 +113,6 @@ def create_index_id(exchange_id, coin_id, period_id):
 	return f'{exchange_id}_{coin_id}_{period_id}'
 
 
-def load_data(index_id, start_time=None, end_time=None):
-	'''
-	Returns dataframe for the specified historical data
-
-	Parameters:
-		index_id   : (str) id to desired historical data
-
-		start_time : (int, unix-utc) returned data
-					 will be >= this time
-			NOTE: if start_time == None, all data before
-				  end_time is returned
-
-		end_time   : (int, unix-utc) returned data
-					 will be <= this time
-			NOTE: if end_time == None, all data after
-				  start_time is returned
-
-	NOTE: start_time parameter uses 'time_period_start' column
-		  as reference. end_time uses 'time_period_end'
-	'''
-
-	#loads index data from django model for given index_id
-	index_data = HistoricalData.objects.get(index_id=index_id)
-
-	#loads all data from file
-	data = pd.read_csv(os.path.join(HISTORICAL_DIR, index_data.file_path))
-
-	#makes data.index equal to 'time_period_start' column
-	data.set_index('time_period_start', drop=False, inplace=True)
-
-	#slices data based on start_time if parameter was given
-	if start_time != None:
-		#catches out out of scope start_time
-		if start_time not in data.index:
-			raise IndexError(f'{start_time} index not in {index_data.file_name}')
-		data = data.loc[start_time: , :]
-
-	#slices data based on end_time if parameter was given
-	if end_time != None:
-		#catches out out of scope end_time
-		if end_time not in data.index:
-			raise IndexError(f'{end_time} index not in {index_data.file_name}')
-		data = data.loc[:end_time, :]
-
-	return data
-
-
 class Historical():
 	base_url = 'https://rest.coinapi.io/v1/'
 	#base url for coinapi.io requests
@@ -275,6 +228,53 @@ class Historical():
 
 		print('Notice: returning filtered items')
 		return filtered_items
+
+
+	def load_data(index_id, start_time=None, end_time=None):
+		'''
+		Returns dataframe for the specified historical data
+
+		Parameters:
+			index_id   : (str) id to desired historical data
+
+			start_time : (int, unix-utc) returned data
+						 will be >= this time
+				NOTE: if start_time == None, all data before
+					  end_time is returned
+
+			end_time   : (int, unix-utc) returned data
+						 will be <= this time
+				NOTE: if end_time == None, all data after
+					  start_time is returned
+
+		NOTE: start_time parameter uses 'time_period_start' column
+			  as reference. end_time uses 'time_period_end'
+		'''
+
+		#loads index data from django model for given index_id
+		index_data = HistoricalData.objects.get(index_id=index_id)
+
+		#loads all data from file
+		data = pd.read_csv(os.path.join(HISTORICAL_DIR, index_data.file_path))
+
+		#makes data.index equal to 'time_period_start' column
+		data.set_index('time_period_start', drop=False, inplace=True)
+
+		#slices data based on start_time if parameter was given
+		if start_time != None:
+			#catches out out of scope start_time
+			if start_time not in data.index:
+				raise IndexError(f'{start_time} index not in {index_data.file_name}')
+			data = data.loc[start_time: , :]
+
+		#slices data based on end_time if parameter was given
+		if end_time != None:
+			#catches out out of scope end_time
+			if end_time not in data.index:
+				raise IndexError(f'{end_time} index not in {index_data.file_name}')
+			data = data.loc[:end_time, :]
+
+		return data
 
 
 	def add_item(exchange_id, coin_id, period_id, time_increment):

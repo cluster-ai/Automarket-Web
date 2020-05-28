@@ -42,10 +42,11 @@
 									var node = document.createElement("li");
 									var button = document.createElement("button");
 									button.id = exchange_id + '_tab'
-									button.onclick = function() {
+
+									button.addEventListener('click', function() {
 										load_sidebar_table(data[exchange_id]);
 										toggle_tab_btn(this.id);
-									};
+									}, false);
 									button.appendChild(document.createTextNode(exchange_id));
 									node.appendChild(button);
 									document.getElementById("sidebar_list").appendChild(node);
@@ -64,15 +65,13 @@
 						<script type="text/javascript">
 
 							function toggle_table_btn(clicked_btn) {
-								var table = document.getElementById('table_body')
-								for (var i = 0, row; row = table.rows[i]; i++) {
-									//reset classes for table_body
-									if (row.id != 'top_row'){
-										document.getElementById(row.id).className = 'table_btn'
-									}
-								}
+								$('#table_body').find('div').each(function(){
+									var btn_id = $(this).attr('id');
+									document.getElementById(btn_id).className = '';
+									console.log(btn_id)
+								});
 								//sets the clicked buttons class to clicked
-								document.getElementById(clicked_btn).className = 'table_btn clicked';
+								document.getElementById(clicked_btn).className = 'clicked';
 							}
 
 							function load_sidebar_table(coins) {
@@ -92,9 +91,11 @@
 									button.className = 'table_btn'
 									button.id = coins[i]['index_id']
 
-									button.onclick = function() {
-										console.log(this.id)
-									}
+									// click event
+									button.addEventListener('click', function() {
+										load_display_box(this.id);
+										toggle_table_btn(this.id);
+									}, false);
 
 									//left column
 									var left_col = document.createElement('span');
@@ -157,11 +158,11 @@
 			<section>
 				<div id="data_selector">
 					<script type="text/javascript">
-						function populate_display_box(columns) {
+						function populate_display_box(columns, index_id) {
 							//clears div
 							var div = document.getElementById('data_selector');
 							while (div.hasChildNodes()) {
-								div.removeChild(table.firstChild);
+								div.removeChild(div.firstChild);
 							};
 
 							//index_id label
@@ -175,12 +176,19 @@
 							//creates a button for each column
 							for (var i = 0; i < columns.length; i++) {
 								var button = document.createElement('BUTTON');
+								button.id = columns[i]
+								button.addEventListener('click', function() {
+									console.log(this.id);
+								}, false);
+
 								button.appendChild(document.createTextNode(columns[i]));
-								btn_list.appendChilde(button);
+								btn_list.appendChild(button);
 							}
 							div.appendChild(btn_list);
 						}
 
+						// requests list of available data for the csv
+						// data available from index_id
 						function load_display_box(index_id) {
 							$.ajax({
 								url: 'display_box/',
@@ -188,8 +196,9 @@
 								dataType: 'json',
 								type: 'POST',
 								success: function (data) {
+									console.log(data.columns)
 									var columns = data.columns;
-									populate_display_box(columns);
+									populate_display_box(columns, index_id);
 								}
 							})
 						}
@@ -252,13 +261,6 @@
 		            }
 		        }
 		    });
-		});
-
-		// when a sidebar table_row is clicked, this is triggered
-		$('#table_body').on('click', function(event){
-			event.preventDefault();
-			console.log("form submitted!") // sanity check
-			//create_post();
 		});
 
 		$.ajax({

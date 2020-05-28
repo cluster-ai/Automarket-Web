@@ -13,7 +13,7 @@ import datetime
 from .forms import DemoLogin
 from .models import DemoKey, HistoricalData, ApiKey
 
-from .market_data import Historical, init_dir, load_data
+from .market_data import Historical, init_dir
 
 #Initializes market_data
 #Historical.backfill('startup_key', 'KRAKEN_ETH_5MIN')
@@ -47,13 +47,16 @@ def demo_page(request):
 
 def display_box(request):
 	if request.method == 'POST':
-		request_index_id = request.POST.get('index_id', None)
+		index_id = request.POST.get('index_id')
 
-		#loads the corresponding df
-		columns = load_data(request_index_id).columns
-		print(columns)
+		#NOT IDEAL, loads entire file and grabs column names
+		df = Historical.load_data(index_id)
+		#extracts columns and converts pd.index to list
+		columns = df.columns.tolist()
 
 		return JsonResponse({'columns': columns})
+	else:
+		return JsonResponse({"nothing to see": "this isn't happening"})
 
 
 def sidebar(request):
