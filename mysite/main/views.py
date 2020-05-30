@@ -16,7 +16,7 @@ from .models import DemoKey, HistoricalData, ApiKey
 from .market_data import Historical, init_dir
 
 #Initializes market_data
-#Historical.backfill('startup_key', 'KRAKEN_ETH_5MIN')
+#Historical.backfill('startup_key', 'COINBASE_BTC_5MIN')
 
 # Create your views here.
 
@@ -45,7 +45,7 @@ def demo_page(request):
 				  'main/demo.html')
 
 
-def display_box(request):
+def control_box(request):
 	if request.method == 'POST':
 		index_id = request.POST.get('index_id')
 

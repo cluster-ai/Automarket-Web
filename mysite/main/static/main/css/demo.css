@@ -199,12 +199,44 @@
 
 #control_box .nested_grid{
 	display: grid;
-	grid-template-columns: 3fr 0 1fr;
+	grid-template-columns: 3fr 0fr 1fr;
 	grid-gap: 1em;
 }
 
 #control_box .vl{
 	grid-column: 2/3;
+}
+
+#control_box #data_selector{
+	text-align: center;
+	grid-row: 1/2;
+}
+
+#control_box #data_selector p{
+	color: #cccccc;
+	margin: 0;
+	margin-bottom: 0.5em;
+}
+
+#control_box #data_selector button{
+	background-color: #474B4F;
+	border: 2px solid #474B4F;
+	color: #cccccc;
+	margin: 0.25em;
+	font-size: 15px;
+	outline: none;
+}
+#control_box #data_selector button:hover{
+	background-color: #363B3E;
+	background-color: #6B6E70;
+	/*color: #6B6E70;*/
+}
+
+#control_box #data_selector .clicked{
+	background-color: #363B3E;
+}
+#control_box #data_selector .clicked:hover{
+	background-color: #363B3E;
 }
 
 #control_box #checkboxes{
@@ -220,27 +252,4 @@
 
 #display_box{
 	grid-column: 3/4;
-}
-
-#display_box #data_selector{
-	text-align: center;
-}
-
-#display_box #data_selector p{
-	color: #cccccc;
-	margin: 0;
-	margin-bottom: 0.5em;
-}
-
-#display_box #data_selector button{
-	background-color: #474B4F;
-	border: 2px solid #474B4F;
-	color: #cccccc;
-	margin: 0.25em;
-	font-size: 15px;
-	outline: none;
-}
-#display_box #data_selector button:hover{
-	background-color: #363B3E;
-	color: #cccccc;
 }

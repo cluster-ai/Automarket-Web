@@ -23,28 +23,24 @@
 					<ul id="sidebar_list">
 						<script type="text/javascript">
 							function toggle_tab_btn(clicked_btn) {
-								var nodes = document.getElementById('sidebar_list')
-								for (var i = 0; i < nodes.length; i++) {
-									//a list item should only have one child: button
-									var button = children[i].fistElementChild;
-									//pull item id
-									var id = button.id;
-									//set classes to none
-									document.getElementById(id).className = '';
-								}
+								$('#sidebar_list').find('li').each(function(){
+									var btn_id = $(this).children('button').attr('id');
+									document.getElementById(btn_id).className = '';
+								});
 								//sets the clicked buttons class to clicked
 								document.getElementById(clicked_btn).className = 'clicked';
 							}
 
 							function load_sidebar_tab(data) {
+								console.log(data)
 								for (var exchange_id in data) {
 									//creates a button in a li with exchange_id as text
 									var node = document.createElement("li");
 									var button = document.createElement("button");
-									button.id = exchange_id + '_tab'
+									button.id = exchange_id
 
 									button.addEventListener('click', function() {
-										load_sidebar_table(data[exchange_id]);
+										load_sidebar_table(data[this.id]);
 										toggle_tab_btn(this.id);
 									}, false);
 									button.appendChild(document.createTextNode(exchange_id));
@@ -149,15 +145,19 @@
 						<label for="scale">Scale Data</label>
 					</div>
 				</section>
-			</section>
-		</div>
-		<div id="display_box">
-			<nav>
-				Display Box
-			</nav>
-			<section>
 				<div id="data_selector">
 					<script type="text/javascript">
+						function toggle_selector_btn(clicked_btn) {
+							// loads clicked_btn
+							var button = document.getElementById(clicked_btn);
+							// determines if clicked is a class
+							if (button.classList.contains('clicked')) {
+								button.classList.remove('clicked');
+							} else {
+								button.classList.add('clicked');
+							}
+						}
+
 						function populate_display_box(columns, index_id) {
 							//clears div
 							var div = document.getElementById('data_selector');
@@ -173,12 +173,13 @@
 							//ul of buttons, each corresponding to a data 
 							//column in market data for given index_id
 							var btn_list = document.createElement('ul');
+							btn_list.id = 'selector_buttons';
 							//creates a button for each column
 							for (var i = 0; i < columns.length; i++) {
 								var button = document.createElement('BUTTON');
 								button.id = columns[i]
 								button.addEventListener('click', function() {
-									console.log(this.id);
+									toggle_selector_btn(this.id);
 								}, false);
 
 								button.appendChild(document.createTextNode(columns[i]));
@@ -191,7 +192,7 @@
 						// data available from index_id
 						function load_display_box(index_id) {
 							$.ajax({
-								url: 'display_box/',
+								url: 'control_box/',
 								data: {'index_id': index_id},
 								dataType: 'json',
 								type: 'POST',
@@ -204,6 +205,13 @@
 						}
 					</script>
 				</div>
+			</section>
+		</div>
+		<div id="display_box">
+			<nav>
+				Display Box
+			</nav>
+			<section>
 			</section>
 		</div>
 	</section>
