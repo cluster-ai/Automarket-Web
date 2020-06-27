@@ -117,3 +117,8 @@ def sidebar(request):
 	'''
 
 	return JsonResponse(data)
+
+
+def market_data_path(request) {
+	Historical.objects.get(index_id="")
+}

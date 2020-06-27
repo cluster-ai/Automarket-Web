@@ -136,6 +136,16 @@
 			<section class="nested_grid">
 				<div class="vl"></div>
 				<section id="checkboxes">
+					<button id="update_graph_btn">Update Graph</button>
+					<script type="text/javascript">
+						button = document.getElementById("update_graph_btn")
+
+						button.addEventListener("click", function() {
+							data = selected_columns() //list of selected column names 
+							//from UI element #data_selector
+							load_graph(data)
+						})
+					</script>
 					<div>
 						<input type="checkbox" name="normalize">
 						<label for="normalize">Normalize Data</label>

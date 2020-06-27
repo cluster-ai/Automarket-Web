@@ -250,6 +250,22 @@
 	cursor: pointer;
 }
 
+#control_box #update_graph_btn{
+	color: #cccccc;
+	background-color: #474B4F;
+	border: 1px solid #474B4F;
+	outline: none;
+	font-size: 16px;
+	margin: 0.5em;
+	margin-bottom: 1em;
+	padding: 0.2em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+#control_box #update_graph_btn:hover{
+	border: 1px solid #222629;
+}
+
 #display_box{
 	grid-column: 3/4;
 }
