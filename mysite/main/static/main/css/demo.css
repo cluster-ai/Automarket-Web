@@ -227,9 +227,8 @@
 	outline: none;
 }
 #control_box #data_selector button:hover{
-	background-color: #363B3E;
 	background-color: #6B6E70;
-	/*color: #6B6E70;*/
+	border-color: #6B6E70;
 }
 
 #control_box #data_selector .clicked{
@@ -246,7 +245,7 @@
 	grid-row: 1/2;
 }
 
-#control_box #checkboxes input{
+#control_box #checkboxes input {
 	cursor: pointer;
 }
 

@@ -1,7 +1,25 @@
 
 
-//Loads the graph based on the given data
-function load_graph(file_path, selected_columns) {
+//Loads the graph based on the selected UI elements in #control_box
+function update_graph() {
+
+  // Finds the selected UI elements in #control_box
+  //#checkboxes
+  //NOTE: should have a preprocessed scale and normalize dataset in market_data
+  let normalize = document.getElementById("normalize").checked;
+  console.log("Normalize:", normalize);
+  let scale = document.getElementById("scale").checked;
+  console.log("Scale:", scale);
+  //#data_selector
+  var selected_columns = [];
+  var listItems = $("#selector_buttons button");
+  listItems.each(function(index, button) {
+    if (button.classList.contains("clicked")) {
+      console.log(button.id);
+    }
+  })
+
+  /*
 
   // set the dimensions and margins of the graph
   var margin = {top: 6, right: 30, bottom: 19, left: 41},
@@ -84,5 +102,5 @@ function load_graph(file_path, selected_columns) {
           .x(function(d) { return x(d.date) })
           .y(function(d) { return y(d.value) })
           )
-    })
+    })*/
 }

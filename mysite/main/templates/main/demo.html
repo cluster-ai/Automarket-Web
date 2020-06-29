@@ -10,6 +10,9 @@
 
 	<script src="https://d3js.org/d3.v4.js"></script>
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+	{% load static %}
+	<script src="{% static 'main/js/demo/graph.js' %}"></script>
 </head>
 <body>
 
@@ -89,7 +92,7 @@
 
 									// click event
 									button.addEventListener('click', function() {
-										load_display_box(this.id);
+										load_control_box(this.id);
 										toggle_table_btn(this.id);
 									}, false);
 
@@ -121,10 +124,6 @@
 			<nav>
 				Graph Box
 			</nav>
-			<section id="graph">
-				{% load static %}
-				<script src="{% static 'main/js/demo/graph.js' %}"></script>
-			</section>
 			<div style="padding: 1em">
   				<input type="range" min="1" max="200" value="100" class="slider">
 			</div>
@@ -141,17 +140,15 @@
 						button = document.getElementById("update_graph_btn")
 
 						button.addEventListener("click", function() {
-							data = selected_columns() //list of selected column names 
-							//from UI element #data_selector
-							load_graph(data)
-						})
+							update_graph();
+						}, false)
 					</script>
 					<div>
-						<input type="checkbox" name="normalize">
+						<input id="normalize" type="checkbox" name="normalize">
 						<label for="normalize">Normalize Data</label>
 					</div>
 					<div>
-						<input type="checkbox" name="scale">
+						<input id="scale" type="checkbox" name="scale">
 						<label for="scale">Scale Data</label>
 					</div>
 				</section>
@@ -168,7 +165,7 @@
 							}
 						}
 
-						function populate_display_box(columns, index_id) {
+						function populate_control_box(columns, index_id) {
 							//clears div
 							var div = document.getElementById('data_selector');
 							while (div.hasChildNodes()) {
@@ -186,7 +183,7 @@
 							btn_list.id = 'selector_buttons';
 							//creates a button for each column
 							for (var i = 0; i < columns.length; i++) {
-								var button = document.createElement('BUTTON');
+								var button = document.createElement('button');
 								button.id = columns[i]
 								button.addEventListener('click', function() {
 									toggle_selector_btn(this.id);
@@ -200,16 +197,15 @@
 
 						// requests list of available data for the csv
 						// data available from index_id
-						function load_display_box(index_id) {
+						function load_control_box(index_id) {
 							$.ajax({
 								url: 'control_box/',
 								data: {'index_id': index_id},
 								dataType: 'json',
 								type: 'POST',
 								success: function (data) {
-									console.log(data.columns)
 									var columns = data.columns;
-									populate_display_box(columns, index_id);
+									populate_control_box(columns, index_id);
 								}
 							})
 						}
