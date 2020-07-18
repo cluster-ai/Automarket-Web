@@ -54,7 +54,17 @@ def control_box(request):
 		#extracts columns and converts pd.index to list
 		columns = df.columns.tolist()
 
-		return JsonResponse({'columns': columns})
+		#removes columns that are not applicable to a line graph
+		return_columns = []
+		for col in columns:
+			if "time" in col:
+				continue
+			elif "isnan" == col:
+				continue
+			else:
+				return_columns.append(col)
+
+		return JsonResponse({'columns': return_columns})
 	else:
 		return JsonResponse({"nothing to see": "this isn't happening"})
 
@@ -119,5 +129,25 @@ def sidebar(request):
 	return JsonResponse(data)
 
 
-def market_data_path(request):
-	Historical.objects.get(index_id="")
+def historical_index(request):
+	if request.method == 'POST':
+		index_id = request.POST.get('index_id')
+
+		raw_data = HistoricalData.objects.filter(index_id=index_id)
+		data = json.loads(serializers.serialize('json', raw_data))[0]
+
+		return JsonResponse(data['fields'])
+	else:
+		return JsonResponse({"nothing to see": "this isn't happening"})
+
+
+def market_data(request):
+	if request.method == 'POST':
+		index_id = request.POST.get('index_id')
+
+		raw_data = Historical.load_data(index_id).head(5)
+		data_dict = raw_data.to_json(orient="records")
+
+		return JsonResponse({'data': data_dict})
+	else:
+		return JsonResponse({"nothing to see": "this isn't happening"})

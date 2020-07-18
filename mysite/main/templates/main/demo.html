@@ -8,7 +8,7 @@
 	{% load static %}
 	<link rel="stylesheet" href="{% static 'main/css/demo.css' %}">
 
-	<script src="https://d3js.org/d3.v4.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
 
 	{% load static %}
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-	<section class="grid">
+	<section class="grid container">
 		<div id="sidebar">
 			<nav>
 				Sidebar
@@ -124,6 +124,7 @@
 			<nav>
 				Graph Box
 			</nav>
+			<canvas id="graph"></canvas>
 			<div style="padding: 1em">
   				<input type="range" min="1" max="200" value="100" class="slider">
 			</div>
@@ -174,6 +175,7 @@
 
 							//index_id label
 							var label = document.createElement('p');
+							label.id = "index_id"
 							label.appendChild(document.createTextNode(index_id));
 							div.appendChild(label)
 

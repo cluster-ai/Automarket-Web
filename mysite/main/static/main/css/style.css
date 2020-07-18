@@ -8,6 +8,8 @@ body{
 /* Global */
 .container{
 	width: 80%;
+	max-width: 1920px;
+	min-width: 800px;
 	margin: auto;
 	overflow: hidden;
 }
@@ -102,6 +104,7 @@ header a:hover{
 #showcase{
 	min-height: 400px;
 	background: url("/static/main/img/showcase.jpg") no-repeat 0 -400px;
+	background-position: center;
 	text-align: center;
 	color: #f4f4f4;
 }
@@ -119,7 +122,13 @@ header a:hover{
 
 /* Boxes */
 #boxes{
-	margin-top:20px;
+	width: 80%;
+	max-width: 1920px;
+	min-width: 800px;
+	display: grid;
+	margin: auto;
+	margin-top: 20px;
+	grid-template-columns: 1fr 1fr 1fr;
 }
 
 #boxes h3{
@@ -129,7 +138,6 @@ header a:hover{
 #boxes .box{
 	float: left;
 	text-align: center;
-	width: 30%;
 	padding: 10px;
 }
 
