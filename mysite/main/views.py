@@ -142,12 +142,36 @@ def historical_index(request):
 
 
 def market_data(request):
+	'''
+	POST data:
+		index_id (str) - id of market data in historical database
+		columns (list(str)) - list of desired columns
+
+	returns:
+		data (list) - df.to_json(orient="values")
+		column_indexes (dict) - list index of selected_columns in df_columns
+	'''
 	if request.method == 'POST':
+		selected_columns = request.POST.getlist('columns[]')
 		index_id = request.POST.get('index_id')
+		print(index_id)
+		print(selected_columns)
 
-		raw_data = Historical.load_data(index_id).head(5)
-		data_dict = raw_data.to_json(orient="records")
+		# Loads market data from database
+		df = Historical.load_data(index_id).head(5)
+		df_columns = list(df.columns)
+		df_values = df.to_json(orient="values")
+		print('\n\ndf_values:', df_values)
 
-		return JsonResponse({'data': data_dict})
+		# generates dict of requested columns and index
+		# EX: {'column1': columns_index(int), ...}
+		column_indexes = {}
+		for col in selected_columns:
+			column_indexes.update({col: df_columns.index(col)})
+
+		return JsonResponse({
+			'data': [0,1,2,3],
+			'column_indexes': column_indexes,
+		})
 	else:
 		return JsonResponse({"nothing to see": "this isn't happening"})
