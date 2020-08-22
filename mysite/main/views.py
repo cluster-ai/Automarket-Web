@@ -154,24 +154,16 @@ def market_data(request):
 	if request.method == 'POST':
 		selected_columns = request.POST.getlist('columns[]')
 		index_id = request.POST.get('index_id')
-		print(index_id)
-		print(selected_columns)
 
 		# Loads market data from database
-		df = Historical.load_data(index_id).head(5)
+		df = Historical.load_data(index_id).tail(5000)
 		df_columns = list(df.columns)
 		df_values = df.to_json(orient="values")
-		print('\n\ndf_values:', df_values)
-
-		# generates dict of requested columns and index
-		# EX: {'column1': columns_index(int), ...}
-		column_indexes = {}
-		for col in selected_columns:
-			column_indexes.update({col: df_columns.index(col)})
+		print(df_columns)
 
 		return JsonResponse({
-			'data': [0,1,2,3],
-			'column_indexes': column_indexes,
+			'data': df_values,
+			'columns': df_columns,
 		})
 	else:
 		return JsonResponse({"nothing to see": "this isn't happening"})

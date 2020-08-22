@@ -24,7 +24,7 @@ function update_graph() {
       dataType: 'json',
       type: 'POST',
       success: function (data) {
-        load_chart(data['data']);
+        load_chart(JSON.parse(data['data']), ['columns']);
       },
       error: function () {
         console.log('error');
@@ -39,22 +39,32 @@ function load_chart(df_values, column_order) {
     df_values (array) - df.to_json(orient="values")
     columns (dict) - key: selected_column, value: list_index of df.columns
   */
+  console.log('VALUES:', df_values);
+
   let myChart = document.getElementById('graph').getContext('2d');
 
-  // TEMPORARY iterates df_values for price_average TEMPORARY //
-  price_average = [];
-  for (row in df_values) {
-    price_average.push(row[2]);
+  function averagePrice(row) {
+    return row[2];
   }
 
-  console.log(Array.from(price_average));
+  var count = 0;
+  var time_period_start = [];
+  function timePeriodStart(row) {
+    time_period_start.push(row[0]);
+  }
+
+  var price_average = df_values.map(averagePrice);
+  df_values.forEach(timePeriodStart);
+
+  console.log('\nPRICE AVERAGE:', price_average);
 
   let massPopChart = new Chart(myChart, {
     //properties
     type:'line', // bar, horizontal, pie, line, doughnut, radar, polarArea
     data:{
-      labels: [],
+      labels: time_period_start,
       datasets:[{
+        borderWidth: 1,
         label: 'price_average',
         data: price_average,
         lineTension: 0,
@@ -70,7 +80,18 @@ function load_chart(df_values, column_order) {
         hover: {
         animationDuration: 0 // duration of animations when hovering an item
       },
-      responsiveAnimationDuration: 0
+      responsiveAnimationDuration: 0,
+      scales: {
+        xAxes: [{
+          ticks: {
+            userCallback: function(item, index) {
+              if (!(index % 500)) return item;
+            },
+            autoSkip: false
+          },
+          display: true
+        }]
+      }
     }
   });
 }
